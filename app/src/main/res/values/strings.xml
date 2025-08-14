@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">swyp</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_profile_keyword1">ProfileKeyword1</string>
+    <string name="title_activity_profile_keyword2">ProfileKeyword2</string>
+    <string name="title_activity_profile_keyword3">ProfileKeyword3</string>
+    <string name="title_activity_profile_select">ProfileSelect</string>
+</resources>

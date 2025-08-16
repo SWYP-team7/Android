@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swyp.ui.theme.SwypTheme
 
-class ProfileKeyword3 : ComponentActivity() {
+class ProfileKeyword4 : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -64,7 +64,7 @@ class ProfileKeyword3 : ComponentActivity() {
                         ProgressScreen()
                         Text()
                         CustomList()
-                        nextButton()
+                        finishButton()
                     }
                 }
             }
@@ -121,7 +121,7 @@ class ProfileKeyword3 : ComponentActivity() {
             )
 
             Text(
-                text = "성향 & 성격 표현",
+                text = "대화에 바라는 것",
                 modifier = Modifier
                     .padding(bottom = 15.dp),
                 style = TextStyle(
@@ -135,7 +135,7 @@ class ProfileKeyword3 : ComponentActivity() {
     }
 
     @Composable
-    fun nextButton() {
+    fun finishButton() {
         val context = LocalContext.current
         Box(
             modifier = Modifier
@@ -150,8 +150,8 @@ class ProfileKeyword3 : ComponentActivity() {
                     .padding(bottom = 40.dp) // 하단에서 80dp 위로 띄움
                 ,
                 onClick = {
-                    val intent = Intent(context, ProfileKeyword4::class.java)
-                    context.startActivity(intent)
+//                    val intent = Intent(context, ProfileKeyword2::class.java)
+//                    context.startActivity(intent)
                 }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
                 // 버튼 색상 지정
@@ -164,7 +164,7 @@ class ProfileKeyword3 : ComponentActivity() {
             ) {
                 // 버튼 내부 내용 구성
                 Text(
-                    "다음", fontSize = 15.sp
+                    "완료", fontSize = 15.sp
                 ) // 글자 크기 20sp로 설정) // 버튼 안에 표시할 글자
 
             }
@@ -197,23 +197,22 @@ class ProfileKeyword3 : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 4, totalSteps = 5)
+        StepProgressIndicator(currentStep = 5, totalSteps = 5)
     }
 
     @Composable
     fun CustomList() {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
-            "낯가림이 있어요",
-            "호기심이 많아요",
-            "감수성이 풍부해요",
-            "계획적인 걸 좋아해요",
-            "즉흥적인 편이에요",
-            "혼자 생각 많이 하는 타입이에요",
-            "분위기를 살피는 편이에요"
+            "나를 더 알고 싶어요",
+            "마음 정리를 해보고 싶어요",
+            "가볍게 소통하고 싶어요",
+            "깊은 대화를 해보고 싶어요",
+            "생각을 정리할 시간이 필요해요",
+            "타인의 시선을 덜 의식하고 싶어요",
         )
         val checkedStates =
-            remember { mutableStateListOf(false, false, false, false, false, false, false) }
+            remember { mutableStateListOf(false, false, false, false, false, false) }
 
         Column(
             modifier = Modifier
@@ -288,7 +287,7 @@ class ProfileKeyword3 : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview7() {
+fun GreetingPreview5() {
     SwypTheme {
 
     }

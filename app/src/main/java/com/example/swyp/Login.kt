@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Divider
+import androidx.compose.material.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,7 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swyp.ui.theme.SwypTheme
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
@@ -56,6 +63,7 @@ class Login : ComponentActivity() {
                         Spacer(modifier = Modifier.height(screenHeight * 0.1f)) // 화면 높이의 40%
                         SubjectTexts()
                         KakaoButton()
+
                     }
                 }
 
@@ -89,7 +97,7 @@ fun SubjectTexts() {
         Text(
             text = "3초 가입으로 바로 시작해보세요.",
             modifier = Modifier
-                .padding(bottom = 15.dp),
+                .padding(top = 15.dp),
             style = TextStyle(
                 color = Color.Gray
             ),
@@ -97,11 +105,14 @@ fun SubjectTexts() {
             fontSize = 12.sp,
         )
     }
-
 }
 
 @Composable
 fun KakaoButton() {
+    TermsAgreementScreen(
+        onAgree = { /* 아무 동작 안 함 */ }
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize() //박스가 화면 전체를 씌워짐
@@ -140,9 +151,71 @@ fun KakaoButton() {
                 )
 
                 // 텍스트
-                Text("카카오로 이용하기"
-                ,fontSize = 15.sp) // 글자 크기 20sp로 설정) // 버튼 안에 표시할 글자
+                Text(
+                    "카카오로 이용하기", fontSize = 15.sp
+                ) // 글자 크기 20sp로 설정) // 버튼 안에 표시할 글자
             }
+        }
+    }
+}
+
+
+@Composable
+fun TermsAgreementScreen(onAgree: () -> Unit) {
+    var allAgree by remember { mutableStateOf(false) }
+    var privacyAgree by remember { mutableStateOf(false) }
+    var termsAgree by remember { mutableStateOf(false) }
+
+    Column(Modifier.padding(16.dp)) {
+        Text("서비스 이용을 위해 약관에 동의해주세요.", fontWeight = FontWeight.Bold)
+
+        Spacer(Modifier.height(16.dp))
+
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = allAgree,
+                onCheckedChange = {
+                    allAgree = it
+                    privacyAgree = it
+                    termsAgree = it
+                }
+            )
+            Text("전체 동의")
+        }
+
+        Divider()
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = privacyAgree, onCheckedChange = { privacyAgree = it })
+            Text("개인정보 수집·이용 동의 (필수)")
+            Spacer(Modifier.weight(1f))
+            TextButton(onClick = { /* TODO: WebView로 Privacy Policy 열기 */ }) {
+                Text("보기", color = Color.Blue, fontSize = 12.sp)
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = termsAgree, onCheckedChange = { termsAgree = it })
+            Text("서비스 이용약관 동의 (필수)")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1f)) // 왼쪽 공간을 최대 차지
+                TextButton(onClick = { /* TODO: WebView로 Terms 문서 열기 */ }) {
+                    Text("보기", color = Color.Blue, fontSize = 12.sp)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = onAgree,
+            enabled = privacyAgree && termsAgree,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("동의하고 계속하기")
         }
     }
 }

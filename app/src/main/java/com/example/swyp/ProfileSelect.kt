@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.graphics.Color.parseColor
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,10 +33,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.DrawerDefaults.backgroundColor
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -60,20 +66,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.swyp.ui.theme.SwypTheme
 import kotlinx.coroutines.launch
 
@@ -85,17 +97,17 @@ class ProfileSelect : ComponentActivity() {
             SwypTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = Color.White
+                    containerColor = Color.White,
                 ) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(innerPadding)
-                    ) {
 
+                    ) {
                         TopText()
                         ProgressScreen()
                         Text()
-                        ProfileScreen() // 여기서 ProfileScreen() 호출
+                        GalleryImageButton()
                         nameTextField()
                         birthTextField()
                         selectGender()
@@ -173,7 +185,7 @@ class ProfileSelect : ComponentActivity() {
                     .padding(bottom = 40.dp) // 하단에서 80dp 위로 띄움
                 ,
                 onClick = {
-                    val intent = Intent(context, ProfileKeyword2::class.java)
+                    val intent = Intent(context, ProfileKeyword1::class.java)
                     context.startActivity(intent)
                 }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
@@ -247,20 +259,30 @@ class ProfileSelect : ComponentActivity() {
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
-            placeholder = { Text("성함을 입력해주세요.", color = Color.LightGray , fontSize = 14.sp) },
+            placeholder = {
+                Text(
+                    "성함을 입력해주세요.",
+                    color = Color.LightGray,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 3.dp),
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .height(50.dp) // 고정된 높이 설정 (예: 56dp, Material Design 표준)
-                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp)), // 테두리 유지
-            textStyle = TextStyle(textAlign = TextAlign.Start), // 텍스트를 가운데 정렬
-            maxLines = 1, // 줄바꿈 방지
+                .height(55.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp)),
+            textStyle = TextStyle(textAlign = TextAlign.Start, fontSize = 15.sp),
+            maxLines = 1,
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White, // 배경색을 흰색으로 설정
-                unfocusedIndicatorColor = Color.Transparent, // 포커스 해제 시 밑줄 투명
-                focusedIndicatorColor = Color.Transparent // 포커스 시 밑줄 투명
-            )
+                backgroundColor = Color.White,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            ),
+            // 여기가 핵심
+            singleLine = true,
         )
+
     }
 
 
@@ -268,44 +290,55 @@ class ProfileSelect : ComponentActivity() {
     fun birthTextField() {
         // 상태 관리
         val text = remember { mutableStateOf("") }
+
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
-                .fillMaxWidth(),
-
-            ) {
+                .fillMaxWidth()
+        ) {
             Text(
                 text = "생년월일",
-                modifier = Modifier.padding(bottom = 8.dp), // 아래 간격
+                modifier = Modifier.padding(bottom = 8.dp),
                 style = TextStyle(color = Color.Black),
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
             )
         }
+
         TextField(
             value = text.value,
-            onValueChange = { newText ->
-                // 숫자만 허용 (0-9만 필터링)
-                val filteredText = newText.filter { it.isDigit() }
-                if (filteredText.length <= 8) { // 8자리 제한
-                    text.value = filteredText
-                } },
-            placeholder = { Text("생년월일 8자리 입력해주세요. ex)19990909", color = Color.LightGray , fontSize = 14.sp) },
+            onValueChange = { input ->
+                // 숫자만 입력 가능 + 최대 8자리 제한
+                if (input.length <= 8 && input.all { it.isDigit() }) {
+                    text.value = input
+                }
+            },
+            placeholder = {
+                Text(
+                    "생년월일 8자리 입력해주세요. ex)19990909",
+                    color = Color.LightGray,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 3.dp),
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .height(50.dp) // 고정된 높이 설정 (예: 56dp, Material Design 표준)
-                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp)), // 테두리 유지
-            textStyle = TextStyle(textAlign = TextAlign.Start), // 텍스트를 가운데 정렬
-            maxLines = 1, // 줄바꿈 방지
+                .height(55.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp)),
+            textStyle = TextStyle(textAlign = TextAlign.Start, fontSize = 15.sp),
+            maxLines = 1,
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White, // 배경색을 흰색으로 설정
-                unfocusedIndicatorColor = Color.Transparent, // 포커스 해제 시 밑줄 투명
-                focusedIndicatorColor = Color.Transparent // 포커스 시 밑줄 투명
-            )
+                backgroundColor = Color.White,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            ),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-
     }
+
+
     @Composable
     fun selectGender() {
         Row(
@@ -340,7 +373,9 @@ class ProfileSelect : ComponentActivity() {
                         .weight(1f) // 가로 공간을 균등하게 분배
                         .padding(horizontal = 6.dp)
                         .background(
-                            color = if (selectedIndex == index) Color(0xFFE9EAFF) else Color(0xFFF6F6F6),
+                            color = if (selectedIndex == index) Color(0xFFE9EAFF) else Color(
+                                0xFFF6F6F6
+                            ),
                             shape = RoundedCornerShape(30.dp)
                         )
                         .clickable {
@@ -363,82 +398,74 @@ class ProfileSelect : ComponentActivity() {
 
 
     @Composable
-    fun ProfileImagePicker() {
-        val context = LocalContext.current
-        var imageUri by remember { mutableStateOf<Uri?>(null) }
-        var hasPermission by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
+    fun GalleryImageButton(
 
-        // 권한 요청 Launcher
-        val permissionLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            hasPermission = isGranted
-        }
+    ) {
+        var showDialog by remember { mutableStateOf(false) }
+        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-        // 갤러리 열기 Launcher
-        val imagePickerLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent(),
-            onResult = { uri: Uri? ->
-                imageUri = uri // 선택된 이미지 URI 저장
-            }
-        )
-
-        // 권한 체크 및 요청
-        LaunchedEffect(Unit) {
-            scope.launch {
-                when (PackageManager.PERMISSION_GRANTED) {
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) -> {
-                        hasPermission = true
-                    }
-
-                    else -> {
-                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }
-                }
+        // 갤러리 열기 런처
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            if (uri != null) {
+                selectedImageUri = uri
             }
         }
 
-        // UI 렌더링
-        if (hasPermission) {
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Box로 겹치기
             Box(
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(130.dp), // Box 크기를 프로필 크기와 동일하게 설정
             ) {
                 // 프로필 이미지
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(Color.LightGray)
-                ) {
-                    AsyncImage(
-                        model = imageUri ?: "https://via.placeholder.com/100", // 기본 이미지 또는 선택된 이미지
-                        contentDescription = "Profile Image",
+                if (selectedImageUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(selectedImageUri),
+                        contentDescription = "선택된 프로필 이미지",
                         modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
+                            .size(130.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop // 원형 안을 꽉 채움
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.profile_select_view),
+                        contentDescription = "기본 프로필 이미지",
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clip(CircleShape),
+                        colorFilter = ColorFilter.tint(Color.LightGray)
                     )
                 }
 
-                // 플러스 버튼
-                Box(
+                // 오른쪽 아래 갤러리 버튼 (프로필 이미지 기준으로 위치)
+                IconButton(
+                    onClick = { showDialog = true },
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable {
-                            imagePickerLauncher.launch("image/*") // 갤러리 열기
-                        },
-                    contentAlignment = Alignment.Center
+                        .align(Alignment.BottomEnd) // Box(=프로필) 기준 오른쪽 아래
+                        .size(40.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.btn_plus), // 플러스 아이콘
-                        contentDescription = "Add Image",
-                        tint = Color.Black
+                    Image(
+                        painter = painterResource(id = R.drawable.profile_gallery_img_btn),
+                        contentDescription = "갤러리 열기",
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+
+                if (showDialog) {
+                    ProfileSelectDialog(
+                        onDismiss = { showDialog = false },
+                        onDefaultSelect = {
+                            selectedImageUri = null // 기본 프로필로 초기화
+                        },
+                        onGallerySelect = {
+                            launcher.launch("image/*") // 갤러리 열기
+                        }
                     )
                 }
             }
@@ -446,8 +473,57 @@ class ProfileSelect : ComponentActivity() {
     }
 
     @Composable
-    fun ProfileScreen() {
-        ProfileImagePicker()
+    fun ProfileSelectDialog(
+        onDismiss: () -> Unit,
+        onDefaultSelect: () -> Unit,
+        onGallerySelect: () -> Unit
+    ) {
+        Dialog(onDismissRequest = onDismiss) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White)
+                    .padding(16.dp)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("프로필 사진 선택", fontWeight = FontWeight.Bold)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 기본 프로필 버튼
+                    Button(
+                        onClick = {
+                            onDefaultSelect()
+                            onDismiss()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6A71FF), // 주황색    // 버튼 배경색
+                            contentColor = Color.White       // 텍스트/아이콘 색
+                        )
+                    ) {
+                        Text("기본 프로필 사용")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 갤러리 선택 버튼
+                    Button(
+                        onClick = {
+                            onGallerySelect()
+                            onDismiss()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6A71FF), // 주황색    // 버튼 배경색
+                            contentColor = Color.White       // 텍스트/아이콘 색
+                        )
+                    ) {
+                        Text("갤러리")
+                    }
+                }
+            }
+        }
     }
 
 }

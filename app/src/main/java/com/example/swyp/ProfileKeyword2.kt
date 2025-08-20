@@ -121,7 +121,7 @@ class ProfileKeyword2 : ComponentActivity() {
             )
 
             Text(
-                text = "관계 & 소통 스타일",
+                text = "대화 스타일",
                 modifier = Modifier
                     .padding(bottom = 15.dp),
                 style = TextStyle(
@@ -197,7 +197,7 @@ class ProfileKeyword2 : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 3, totalSteps = 5)
+        StepProgressIndicator(currentStep = 3, totalSteps = 4)
     }
 
     @Composable
@@ -205,12 +205,12 @@ class ProfileKeyword2 : ComponentActivity() {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
             "말보다 듣는 걸 좋아해요",
-            "대화가 서툴지만 좋아해요",
-            "가까운 사람일수록 어려워요",
-            "갈등 상황을 피하려 해요",
-            "진심을 말하기가 두려워요",
-            "공감 잘한다고 자주 들어요",
-            "솔직한 대화를 좋아해요"
+            "말하는 것을 좋아해요",
+            "공감을 잘해요",
+            "솔직한 대화를 좋아해요",
+            "진지하고 차분한 대화를 선호해요",
+            "농담과 유머가 많아요",
+            "질문을 잘해요"
         )
         val checkedStates =
             remember { mutableStateListOf(false, false, false, false, false, false, false) }

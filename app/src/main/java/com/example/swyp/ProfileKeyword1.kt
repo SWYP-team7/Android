@@ -133,7 +133,7 @@ class ProfileKeyword1 : ComponentActivity() {
             )
 
             Text(
-                text = "자기이해 & 감정 표현",
+                text = "성향 & 성격 표현",
                 modifier = Modifier
                     .padding(bottom = 15.dp),
                 style = TextStyle(
@@ -209,20 +209,20 @@ class ProfileKeyword1 : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 2, totalSteps = 5)
+        StepProgressIndicator(currentStep = 2, totalSteps = 4)
     }
 
     @Composable
     fun CustomList() {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
-            "감정 표현이 서툴러요",
-            "요즘 내 마음을 모르겠어요",
-            "자존감에 대해 고민 중",
-            "감정 기복이 심해요",
-            "생각은 많은데 말이 잘 안 나와요",
-            "혼자 있는 게 편하지만 외롭기도 해요",
-            "자기애를 해보고 싶어요"
+            "내향적이에요.",
+            "외향적이에요.",
+            "신중해요.",
+            "충동적이에요.",
+            "차분해요.",
+            "활발해요.",
+            "논리적이에요."
         )
         val checkedStates =
             remember { mutableStateListOf(false, false, false, false, false, false, false) }

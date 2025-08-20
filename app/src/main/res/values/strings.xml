@@ -7,4 +7,5 @@
     <string name="title_activity_profile_select">ProfileSelect</string>
     <string name="title_activity_profile_keyword4">ProfileKeyword4</string>
     <string name="title_activity_profile_keyword5">ProfileKeyword5</string>
+    <string name="title_activity_sign_up_finish">SignUpFinish</string>
 </resources>

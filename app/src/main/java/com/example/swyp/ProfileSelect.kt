@@ -232,7 +232,7 @@ class ProfileSelect : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 1, totalSteps = 5)
+        StepProgressIndicator(currentStep = 1, totalSteps = 4)
     }
 
 

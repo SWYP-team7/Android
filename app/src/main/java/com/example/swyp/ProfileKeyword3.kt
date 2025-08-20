@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -121,7 +123,7 @@ class ProfileKeyword3 : ComponentActivity() {
             )
 
             Text(
-                text = "성향 & 성격 표현",
+                text = "관심사",
                 modifier = Modifier
                     .padding(bottom = 15.dp),
                 style = TextStyle(
@@ -150,7 +152,7 @@ class ProfileKeyword3 : ComponentActivity() {
                     .padding(bottom = 40.dp) // 하단에서 80dp 위로 띄움
                 ,
                 onClick = {
-                    val intent = Intent(context, ProfileKeyword4::class.java)
+                    val intent = Intent(context, SignUpFinish::class.java)
                     context.startActivity(intent)
                 }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
@@ -197,86 +199,85 @@ class ProfileKeyword3 : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 4, totalSteps = 5)
+        StepProgressIndicator(currentStep = 4, totalSteps = 4)
     }
 
     @Composable
     fun CustomList() {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
-            "낯가림이 있어요",
-            "호기심이 많아요",
-            "감수성이 풍부해요",
-            "계획적인 걸 좋아해요",
-            "즉흥적인 편이에요",
-            "혼자 생각 많이 하는 타입이에요",
-            "분위기를 살피는 편이에요"
+            "음악", "영화", "드라마", "미술", "관계", "운동",
+            "게임", "여행", "요리", "사진", "진로",
+            "사회이슈", "자기계발", "연애", "도서"
         )
         val checkedStates =
-            remember { mutableStateListOf(false, false, false, false, false, false, false) }
+            remember {
+                mutableStateListOf(
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                )
+            }
 
-        Column(
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            items.forEachIndexed { index, text ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(55.dp)
-                        .padding(vertical = 6.dp)
-                        .background(
-                            color = if (checkedStates[index]) Color(0xFFE9EAFF) else Color(
-                                0xFFF6F6F6
-                            ),
-                            shape = RoundedCornerShape(30.dp)
-                        )
-                        .clickable {
-                            checkedStates[index] = !checkedStates[index] // 선택 상태 토글
-                        },
-                    contentAlignment = Alignment.CenterStart
-                ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp) // 줄 사이 간격
+            ) {
+                // items를 5개씩 분할하여 3줄로 배치
+                items.chunked(3).forEach { rowItems ->
                     Row(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 6.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(18.dp), // 칸 사이 18dp 간격
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 커스텀 둥근 체크박스
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(
+                        rowItems.forEachIndexed { indexInRow, text ->
+                            val index = items.indexOf(text) // 전체 리스트에서의 인덱스
+                            Box(
+                                modifier = Modifier
+                                    .width(85.dp)
+                                    .height(55.dp)
+                                    .padding(vertical = 6.dp)
+                                    .background(
+                                        color = if (checkedStates[index]) Color(0xFFE9EAFF) else Color(
+                                            0xFFF6F6F6
+                                        ),
+                                        shape = RoundedCornerShape(30.dp)
+                                    )
+                                    .clickable {
+                                        checkedStates[index] = !checkedStates[index]
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = text,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = if (checkedStates[index]) Color(0xFF6A71FF) else Color(
-                                        0xFFE0E0E0
-                                    ),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (checkedStates[index]) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(16.dp)
+                                        0xFF888888
+                                    )
                                 )
                             }
-                        }
-                        Spacer(modifier = Modifier.width(20.dp))
-                        if (checkedStates[index]) {
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF6A71FF)
-                            )
-                        } else {
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF888888)
-                            )
                         }
                     }
                 }

@@ -55,6 +55,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.runtime.mutableStateListOf
@@ -98,20 +99,24 @@ class ProfileSelect : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.White,
-                ) { innerPadding ->
+
+                    ) { innerPadding ->
                     Column(
                         modifier = Modifier
-                            .padding(innerPadding)
+                            .padding(innerPadding),
 
-                    ) {
+                        ) {
+                        val name = remember { mutableStateOf("") }
+                        val birth = remember { mutableStateOf("") }
+                        val gender = remember { mutableStateOf<String?>(null) }
                         TopText()
                         ProgressScreen()
                         Text()
                         GalleryImageButton()
-                        nameTextField()
-                        birthTextField()
-                        selectGender()
-                        nextButton()
+                        nameTextField(name)
+                        birthTextField(birth)
+                        selectGender(gender)
+                        nextButton(name, birth,gender)
                     }
                 }
             }
@@ -170,7 +175,7 @@ class ProfileSelect : ComponentActivity() {
     }
 
     @Composable
-    fun nextButton() {
+    fun nextButton(name: MutableState<String>, birth: MutableState<String>,gender: MutableState<String?>) {
         val context = LocalContext.current
         Box(
             modifier = Modifier
@@ -185,7 +190,39 @@ class ProfileSelect : ComponentActivity() {
                     .padding(bottom = 40.dp) // 하단에서 80dp 위로 띄움
                 ,
                 onClick = {
-                    val intent = Intent(context, ProfileKeyword1::class.java)
+                    val lenName = name.value.length
+                    val lenBirth = birth.value.length
+                    val selectedGender = gender.value
+                    //성별을 클릭하지 않았을때
+
+
+                    //이름을 입력하지 않았을때
+                    if (lenName == 0) {
+                        // 실패 → 토스트
+                        Toast.makeText(context, "이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    } else if (lenName == 1) {
+                        Toast.makeText(context, "이름은 2자 이상 15이하로 입력해주세요.", Toast.LENGTH_SHORT)
+                            .show()
+
+                    }
+
+                    //생일을 입력하지 않았을때
+                    else if (lenBirth == 1) {
+                        // 실패 → 토스트
+                        Toast.makeText(context, "생일을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    } else if (lenBirth < 8) {
+                        Toast.makeText(context, "생일을 입력은 8자 입니다.", Toast.LENGTH_SHORT).show()
+                    } else if (selectedGender == null) {
+                        Toast.makeText(context, "성별을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    // ✅ 모두 통과 → 이동
+                    val intent = Intent(context, ProfileKeyword1::class.java).apply {
+                        putExtra("name", name.value)
+                        putExtra("birth", birth.value)
+                        putExtra("gender", selectedGender) // "남성" 또는 "여성"
+                    }
                     context.startActivity(intent)
                 }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
@@ -237,35 +274,28 @@ class ProfileSelect : ComponentActivity() {
 
 
     @Composable
-    fun nameTextField() {
-        // 상태 관리
-        val text = remember { mutableStateOf("") }
+    fun nameTextField(name: MutableState<String>) {
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
-                .fillMaxWidth(),
-
-            ) {
+                .fillMaxWidth()
+        ) {
             Text(
                 text = "이름",
-                modifier = Modifier.padding(bottom = 8.dp), // 아래 간격
+                modifier = Modifier.padding(bottom = 8.dp),
                 style = TextStyle(color = Color.Black),
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
             )
         }
 
-
         TextField(
-            value = text.value,
-            onValueChange = { text.value = it },
+            value = name.value,
+            onValueChange = { newText ->
+                name.value = newText.take(15) // 15자까지만 입력
+            },
             placeholder = {
-                Text(
-                    "성함을 입력해주세요.",
-                    color = Color.LightGray,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(bottom = 3.dp),
-                )
+                Text("성함을 입력해주세요.", color = Color.LightGray, fontSize = 15.sp)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -279,17 +309,14 @@ class ProfileSelect : ComponentActivity() {
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent
             ),
-            // 여기가 핵심
-            singleLine = true,
+            singleLine = true
         )
-
     }
 
 
     @Composable
-    fun birthTextField() {
+    fun birthTextField(birth: MutableState<String>) {
         // 상태 관리
-        val text = remember { mutableStateOf("") }
 
         Column(
             modifier = Modifier
@@ -306,11 +333,11 @@ class ProfileSelect : ComponentActivity() {
         }
 
         TextField(
-            value = text.value,
+            value = birth.value,
             onValueChange = { input ->
                 // 숫자만 입력 가능 + 최대 8자리 제한
                 if (input.length <= 8 && input.all { it.isDigit() }) {
-                    text.value = input
+                    birth.value = input
                 }
             },
             placeholder = {
@@ -340,61 +367,48 @@ class ProfileSelect : ComponentActivity() {
 
 
     @Composable
-    fun selectGender() {
-        Row(
-            modifier = Modifier
-                .padding(start = 16.dp),
-        ) {
+    fun selectGender(gender: MutableState<String?>) {
+        Row(modifier = Modifier.padding(start = 16.dp)) {
             Text(
                 text = "성별",
-                modifier = Modifier.padding(bottom = 8.dp), // 아래 간격
+                modifier = Modifier.padding(bottom = 8.dp),
                 style = TextStyle(color = Color.Black),
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
             )
         }
 
-        // 단일 선택을 위한 상태 관리 (현재 선택된 인덱스)
-        var selectedIndex by remember { mutableStateOf<Int?>(null) }
-
-        val items = listOf(
-            "남성",
-            "여성"
-        )
+        val items = listOf("남성", "여성")
 
         Row(
-            modifier = Modifier
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp) // 버튼 간 간격 조정
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items.forEachIndexed { index, text ->
+            items.forEach { item ->
                 Box(
                     modifier = Modifier
-                        .weight(1f) // 가로 공간을 균등하게 분배
+                        .weight(1f)
                         .padding(horizontal = 6.dp)
                         .background(
-                            color = if (selectedIndex == index) Color(0xFFE9EAFF) else Color(
-                                0xFFF6F6F6
-                            ),
+                            color = if (gender.value == item) Color(0xFFE9EAFF) else Color(0xFFF6F6F6),
                             shape = RoundedCornerShape(30.dp)
                         )
                         .clickable {
-                            // 선택된 인덱스가 현재 인덱스와 같으면 해제, 다르면 새로 선택
-                            selectedIndex = if (selectedIndex == index) null else index
+                            gender.value = if (gender.value == item) null else item
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = text,
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 6.dp),
+                        text = item,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (selectedIndex == index) Color(0xFF6A71FF) else Color(0xFF888888)
+                        color = if (gender.value == item) Color(0xFF6A71FF) else Color(0xFF888888)
                     )
                 }
             }
         }
     }
+
 
 
     @Composable

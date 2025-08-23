@@ -16,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Swyp"
+        android:name=".App"
         tools:targetApi="31">
         <activity
             android:name=".SignUpFinish"
@@ -29,12 +30,12 @@
             android:label="@string/title_activity_profile_select"
             android:theme="@style/Theme.Swyp" />
         <activity
-            android:name=".Login"
+            android:name=".ProfileKeyword3"
             android:exported="false"
             android:label="@string/title_activity_profile_keyword3"
             android:theme="@style/Theme.Swyp" />
         <activity
-            android:name=".ProfileKeyword2"
+            android:name=".Login"
             android:exported="false"
             android:label="@string/title_activity_profile_keyword2"
             android:theme="@style/Theme.Swyp" />
@@ -49,7 +50,7 @@
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.Swyp" />
         <activity
-            android:name=".ProfileKeyword3"
+            android:name=".ProfileKeyword2"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Swyp">

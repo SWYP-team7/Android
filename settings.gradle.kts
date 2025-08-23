@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "swyp"
 include(":app")
- 
+include(":core")
+include(":feature")
+

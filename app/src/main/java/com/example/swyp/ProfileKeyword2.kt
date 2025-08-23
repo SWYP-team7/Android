@@ -3,6 +3,7 @@ package com.example.swyp
 import android.content.Intent
 import android.graphics.Color.parseColor
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
@@ -52,6 +53,13 @@ class ProfileKeyword2 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SwypTheme {
+                val checkedStates = remember {
+                    mutableStateListOf(
+                        false, false, false, false, false,
+                        false, false, false, false, false
+                    )
+                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.White
@@ -63,8 +71,8 @@ class ProfileKeyword2 : ComponentActivity() {
                         TopText()
                         ProgressScreen()
                         Text()
-                        CustomList()
-                        nextButton()
+                        CustomList(checkedStates)
+                        nextButton(checkedStates)
                     }
                 }
             }
@@ -135,7 +143,7 @@ class ProfileKeyword2 : ComponentActivity() {
     }
 
     @Composable
-    fun nextButton() {
+    fun nextButton(checkedStates: List<Boolean>) {
         val context = LocalContext.current
         Box(
             modifier = Modifier
@@ -144,15 +152,21 @@ class ProfileKeyword2 : ComponentActivity() {
         ) {
             Button(
                 // 버튼이 차지할 레이아웃 속성 지정
+
+                onClick = {
+                    if (checkedStates.none { it }) {
+                        Toast.makeText(context, "하나 이상 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val intent = Intent(context, ProfileKeyword3::class.java)
+                        context.startActivity(intent)
+                    }
+                }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
+
                 modifier = Modifier
                     .fillMaxWidth() // 가로 전체 너비 사용
                     .align(Alignment.BottomCenter) // Box 안에서 하단 중앙에 배치
                     .padding(bottom = 40.dp) // 하단에서 80dp 위로 띄움
                 ,
-                onClick = {
-                    val intent = Intent(context, ProfileKeyword3::class.java)
-                    context.startActivity(intent)
-                }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
                 // 버튼 색상 지정
                 colors = ButtonDefaults.buttonColors( // Material3용 ButtonDefaults import 필요
@@ -201,7 +215,7 @@ class ProfileKeyword2 : ComponentActivity() {
     }
 
     @Composable
-    fun CustomList() {
+    fun CustomList(checkedStates: MutableList<Boolean>) {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
             "말보다 듣는 걸 좋아해요",
@@ -212,8 +226,7 @@ class ProfileKeyword2 : ComponentActivity() {
             "농담과 유머가 많아요",
             "질문을 잘해요"
         )
-        val checkedStates =
-            remember { mutableStateListOf(false, false, false, false, false, false, false) }
+
 
         Column(
             modifier = Modifier

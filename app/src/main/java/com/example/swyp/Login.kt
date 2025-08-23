@@ -157,13 +157,13 @@ fun KakaoButton() {
                 horizontalArrangement = Arrangement.Center        // 가로 방향 중앙 정렬
             ) {
                 // 왼쪽 아이콘
-                Image(
-                    painter = painterResource(id = R.drawable.kakao_login_button), // 리소스 이미지 불러오기 (res/drawable/kakao_login_button.png)
-                    contentDescription = "카카오 아이콘", // 접근성(스크린리더) 설명 텍스트
-                    modifier = Modifier
-                        .size(25.dp)           // 아이콘 크기 20dp
-                        .padding(end = 8.dp)   // 아이콘과 텍스트 사이 간격 8dp
-                )
+//                Image(
+////                    painter = painterResource(id = R.drawable.kakao_login_button), // 리소스 이미지 불러오기 (res/drawable/kakao_login_button.png)
+//                    contentDescription = "카카오 아이콘", // 접근성(스크린리더) 설명 텍스트
+//                    modifier = Modifier
+//                        .size(25.dp)           // 아이콘 크기 20dp
+//                        .padding(end = 8.dp)   // 아이콘과 텍스트 사이 간격 8dp
+//                )
 
                 // 텍스트
                 Text(

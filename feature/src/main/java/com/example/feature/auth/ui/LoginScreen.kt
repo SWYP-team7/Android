@@ -1,6 +1,7 @@
 // app/src/main/java/com/example/swyp/feature/auth/ui/LoginScreen.kt
 package com.example.feature.auth.ui
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -10,12 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.feature.R
+import com.example.feature.auth.ProfileKeyword1
+import com.example.feature.auth.ProfileSelect
+import kotlin.jvm.java
+
 @Composable
 fun LoginScreen(
     onKakaoLogin: () -> Unit
@@ -23,7 +29,7 @@ fun LoginScreen(
     Box(Modifier.fillMaxSize()) {
         // 배경 이미지
         Image(
-            painter = painterResource(id = R.drawable.kakao_login_button),
+            painter = painterResource(id = R.drawable.login_background_img),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -74,23 +80,30 @@ private fun SubjectTexts() {
 
 @Composable
 private fun KakaoButton(onClick: () -> Unit) {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Button(
+            onClick = {
+                    val intent = Intent(context, ProfileSelect::class.java)
+                    context.startActivity(intent)
+            },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 20.dp)
                 .navigationBarsPadding(),
-            onClick = onClick,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFFEE500),
                 contentColor = Color.Black
             ),
             shape = MaterialTheme.shapes.medium
+
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -39,6 +39,17 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-
+    implementation("androidx.compose.material:material:1.6.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(project(":core"))
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

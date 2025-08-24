@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">feature</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_my_page">MyPage</string>
+    <string name="title_activity_profile_update">ProfileUpdate</string>
+    <string name="title_activity_profile_keyword1_update">ProfileKeyword1Update</string>
+    <string name="title_activity_profile_keyword2_update">ProfileKeyword2Update</string>
+    <string name="title_activity_profile_keyword3_update">ProfileKeyword3Update</string>
 </resources>

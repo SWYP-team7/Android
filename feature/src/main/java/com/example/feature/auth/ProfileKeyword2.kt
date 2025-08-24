@@ -1,5 +1,6 @@
-package com.example.swyp
+package com.example.feature.auth
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color.parseColor
 import android.os.Bundle
@@ -17,8 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,21 +42,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.swyp.ui.theme.SwypTheme
+import com.google.gson.Gson
 
-class ProfileKeyword3 : ComponentActivity() {
+class ProfileKeyword2 : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SwypTheme {
+
                 val checkedStates = remember {
                     mutableStateListOf(
-                        false, false, false, false, false,
                         false, false, false, false, false,
                         false, false, false, false, false
                     )
@@ -79,7 +75,7 @@ class ProfileKeyword3 : ComponentActivity() {
                     }
                 }
             }
-        }
+
     }
 
     @Composable
@@ -132,7 +128,7 @@ class ProfileKeyword3 : ComponentActivity() {
             )
 
             Text(
-                text = "관심사",
+                text = "대화 스타일",
                 modifier = Modifier
                     .padding(bottom = 15.dp),
                 style = TextStyle(
@@ -148,24 +144,41 @@ class ProfileKeyword3 : ComponentActivity() {
     @Composable
     fun nextButton(checkedStates: List<Boolean>) {
         val context = LocalContext.current
+        val name = intent.getStringExtra("name")
+        val items = listOf(
+            "말보다 듣는 걸 좋아해요",
+            "말하는 것을 좋아해요",
+            "공감을 잘해요",
+            "솔직한 대화를 좋아해요",
+            "진지하고 차분한 대화를 선호해요",
+            "농담과 유머가 많아요",
+            "질문을 잘해요"
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize() //박스가 화면 전체를 씌워짐
                 .padding(16.dp) //박스 내부에 16dp 만큼 여백을 줌
         ) {
             Button(
-                onClick = {
+                // 버튼이 차지할 레이아웃 속성 지정
 
-                    if (checkedStates.none{it}){
-                        Toast.makeText(context,"하나 이상 선택해주세요.",Toast.LENGTH_SHORT).show()
-                    }else{
-                        val intent = Intent(context, SignUpFinish::class.java)
+                onClick = {
+                    if (checkedStates.none { it }) {
+                        Toast.makeText(context, "하나 이상 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // 선택된 키워드만 추출
+                        val selectedKeywords = items.filterIndexed { index, _ -> checkedStates[index] }
+                        // SharedPreferences에 선택된 키워드만 저장
+                        saveSelectedKeywords(context, selectedKeywords)
+
+                        val intent = Intent(context, ProfileKeyword3::class.java)
+                            .apply {
+                                putExtra("name", name)
+                            }
                         context.startActivity(intent)
                     }
                 }, // 버튼 클릭 시 동작 (여기서는 비어 있음)
 
-
-                // 버튼이 차지할 레이아웃 속성 지정
                 modifier = Modifier
                     .fillMaxWidth() // 가로 전체 너비 사용
                     .align(Alignment.BottomCenter) // Box 안에서 하단 중앙에 배치
@@ -186,6 +199,16 @@ class ProfileKeyword3 : ComponentActivity() {
                 ) // 글자 크기 20sp로 설정) // 버튼 안에 표시할 글자
 
             }
+        }
+    }
+
+    private fun saveSelectedKeywords(context: Context, selectedKeywords: List<String>) {
+        val sharedPreferences = context.getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val keywordsJson = gson.toJson(selectedKeywords)
+        with(sharedPreferences.edit()) {
+            putString("selectedKeywords2", keywordsJson)
+            apply()
         }
     }
 
@@ -215,77 +238,100 @@ class ProfileKeyword3 : ComponentActivity() {
 
     @Composable
     fun ProgressScreen() {
-        StepProgressIndicator(currentStep = 4, totalSteps = 4)
+        StepProgressIndicator(currentStep = 3, totalSteps = 4)
     }
 
     @Composable
     fun CustomList(checkedStates: MutableList<Boolean>) {
         // 각 항목의 선택 상태를 동적으로 관리
         val items = listOf(
-            "음악", "영화", "드라마", "미술", "관계", "운동",
-            "게임", "여행", "요리", "사진", "진로",
-            "사회이슈", "자기계발", "연애", "도서"
+            "말보다 듣는 걸 좋아해요",
+            "말하는 것을 좋아해요",
+            "공감을 잘해요",
+            "솔직한 대화를 좋아해요",
+            "진지하고 차분한 대화를 선호해요",
+            "농담과 유머가 많아요",
+            "질문을 잘해요"
         )
 
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp) // 줄 사이 간격
-            ) {
-                // items를 5개씩 분할하여 3줄로 배치
-                items.chunked(3).forEach { rowItems ->
+            items.forEachIndexed { index, text ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(55.dp)
+                        .padding(vertical = 6.dp)
+                        .background(
+                            color = if (checkedStates[index]) Color(0xFFE9EAFF) else Color(
+                                0xFFF6F6F6
+                            ),
+                            shape = RoundedCornerShape(30.dp)
+                        )
+                        .clickable {
+                            checkedStates[index] = !checkedStates[index] // 선택 상태 토글
+                        },
+                    contentAlignment = Alignment.CenterStart
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(18.dp), // 칸 사이 18dp 간격
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 6.dp)
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        rowItems.forEachIndexed { indexInRow, text ->
-                            val index = items.indexOf(text) // 전체 리스트에서의 인덱스
-                            Box(
-                                modifier = Modifier
-                                    .width(85.dp)
-                                    .height(55.dp)
-                                    .padding(vertical = 6.dp)
-                                    .background(
-                                        color = if (checkedStates[index]) Color(0xFFE9EAFF) else Color(
-                                            0xFFF6F6F6
-                                        ),
-                                        shape = RoundedCornerShape(30.dp)
-                                    )
-                                    .clickable {
-                                        checkedStates[index] = !checkedStates[index]
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = text,
-                                    style = MaterialTheme.typography.bodyMedium,
+                        // 커스텀 둥근 체크박스
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .background(
                                     color = if (checkedStates[index]) Color(0xFF6A71FF) else Color(
-                                        0xFF888888
-                                    )
+                                        0xFFE0E0E0
+                                    ),
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (checkedStates[index]) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp)
                                 )
                             }
+                        }
+                        Spacer(modifier = Modifier.width(20.dp))
+                        if (checkedStates[index]) {
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF6A71FF)
+                            )
+                        } else {
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF888888)
+                            )
                         }
                     }
                 }
             }
         }
     }
+
+
+
+
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview7() {
-    SwypTheme {
 
-    }
+@Composable
+fun GreetingPreview4() {
+
 }

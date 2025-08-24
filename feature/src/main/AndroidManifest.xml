@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Android 12 이하 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Android 13 이상 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -8,6 +11,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Swyp">
+        <activity
+            android:name=".auth.ProfileKeyword3Update"
+            android:exported="false"
+            android:label="@string/title_activity_profile_keyword3_update"
+            android:theme="@style/Theme.Swyp" />
+        <activity
+            android:name=".auth.ProfileKeyword2Update"
+            android:exported="false"
+            android:label="@string/title_activity_profile_keyword2_update"
+            android:theme="@style/Theme.Swyp" />
+        <activity
+            android:name=".auth.ProfileKeyword1Update"
+            android:exported="false"
+            android:label="@string/title_activity_profile_keyword1_update"
+            android:theme="@style/Theme.Swyp" />
+        <activity
+            android:name=".auth.ProfileUpdate"
+            android:exported="false"
+            android:label="@string/title_activity_profile_update"
+            android:theme="@style/Theme.Swyp" />
     </application>
 
 </manifest>
